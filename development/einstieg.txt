@@ -1,0 +1,75 @@
+= upgrade =
+SharePoint 2019 Management Shell als Administrator:
+stsadm.exe -o localupgradestatus
+psconfig -cmd upgrade -inplace b2b -wait
+
+= custom tiles =
+SharePoint 2019 Management Shell als Administrator:
+Enable-SPFeature -Identity CustomTiles -Url "http://SP2019"
+Enable-SPFeature -Identity CustomTiles -Url "http://SP2019:8033"
+
+App-Launcher konfigurieren: "http://SP2019/lists/custom tiles/"
+
+= Proxy setzen =
+npm config set proxy http://192.168.240.70:3128
+npm config set https-proxy http://192.168.240.70:3128
+
+= Entwicklungsumgebung einrichten =
+https://docs.microsoft.com/de-de/sharepoint/dev/spfx/set-up-your-development-environment
+https://github.com/StfBauer/sp-dev-docs/blob/patch-6/docs/spfx/set-up-your-development-environment.md
+
+- node.js installieren (LTS version 8!)
+- npm install -g yo gulp
+- npm install -g @microsoft/generator-sharepoint
+
+= Projekt anlegen =
+https://docs.microsoft.com/de-DE/sharepoint/dev/spfx/web-parts/get-started/build-a-hello-world-web-part
+
+- cd C:\Temp\SharePointFramework\Projects
+- md helloworld-webpart
+- cd helloworld-webpart
+- yo @microsoft/sharepoint
+
+- npm shrinkwrap (optional, siehe https://www.c-sharpcorner.com/article/spfx-with-sharepoint-2019/)
+- code . (Code Editor starten)
+
+= Projekt erstellen =
+https://docs.microsoft.com/de-DE/sharepoint/dev/spfx/web-parts/get-started/build-a-hello-world-web-part
+
+- C:\Temp\SharePointFramework\Projects\helloworld-webpart
+- gulp trust-dev-cert
+- gulp serve
+
+= Projekt bereitstellen =
+https://docs.microsoft.com/de-DE/sharepoint/dev/spfx/web-parts/get-started/serve-your-web-part-in-a-sharepoint-page
+
+Version in package.json und package-solution anpassen.
+
+- gulp stoppen, wenn's noch läuft
+- gulp clean
+- gulp build
+- gulp bundle --ship (minify the assests to "temp\deploy"
+- gulp package-solution --ship (creates the sppkg in "sharepoint\solution")
+- goto site's app catalog and upload the "helloworld-webpart\sharepoint\solution\helloword-webpart.sppkg"
+
+= Nennenswertes =
+- Die Option --ship bedeutet, dass ein Build for Distribution (Release) erstellt wird, Build Target is SHIP.
+- npm version [major|minor|patch] zum Erhöhen der Version in package.json (NodeJS Projekt Version, 3stellig, Major.Minor.Patch)
+- die Version in package-solution.js (webpart) ist die Visual Studio Projekt Version (4stellig, Major.Minor.Build.Revision)
+
+= jquery installieren =
+- npm install jquery (JavaScript Lib)
+- npm install @types/jquery --save (TypeScript)
+- npm install @types/jquery.datatables --save (TypeScript)
+
+= Update to SPFx 1.4.1 (SP19, latest supported version)
+npm outdated
+
+npm install @microsoft/sp-build-web@1.4.1 --save
+npm install @microsoft/sp-core-library@1.4.1 --save
+npm install @microsoft/sp-lodash-subset@1.4.1 --save
+npm install @microsoft/sp-module-interfaces@1.4.1 --save
+npm install @microsoft/sp-office-ui-fabric-core@1.4.1 --save
+npm install @microsoft/sp-webpart-base@1.4.1 --save
+npm install @microsoft/sp-webpart-workbench@1.4.1 --save
+
