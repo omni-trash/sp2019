@@ -1,0 +1,64 @@
+<script type="text/javascript" defer>
+/*
+Zellen für bestimmte Spalten in Abhängigkeit vom Zellinhalt farblich hervorheben.
+*/
+(function () {
+	// returns the number of previous siblings
+	function getNumPrevSiblings(node) {
+		var num = 0;
+
+		while (node && node.previousSibling) {
+			node = node.previousSibling;
+			num = num + 1;
+		}
+
+		return num;
+	}
+
+	// retuns all data cells of the column with the display name
+	function getCells(displayName) {
+		var result = [];
+
+		// get the column headers by display name
+		var headers = Array.prototype.slice.call(document.querySelectorAll("thead[role=presentation] > tr[role=row] > th[role=columnheader] > div[displayname='" + displayName + "']"));
+
+		headers.forEach(function(item) {
+			// the outer table
+			var table = item.parentNode.parentNode.parentNode.parentNode;
+
+			// see query selector
+			// item is a div
+			// item.parentNode is th
+			var index = getNumPrevSiblings(item.parentNode);
+
+			// the data cells
+			var cells = Array.prototype.slice.call(table.querySelectorAll("tbody > tr[role=row] > td[role=gridcell]:nth-child(" + (index + 1) + ")"));
+
+			// simple add the cells to one dimensional array
+			result = result.concat(cells);
+		});
+
+		return result;
+	}
+
+	function cellFormat(displayName, callback) {
+		getCells(displayName).forEach(callback);
+	};
+
+	function contentLoaded() {
+		console.log("format cells");
+
+		["Column Name 1", "Column Name 2", "Column Name 2"].forEach(function(displayName) {
+			cellFormat(displayName, function(cell) {
+				if ((cell.innerText || cell.textContent) != "Abgeschlossen") {
+					cell.style["backgroundColor"] = "rgb(255, 240, 240)";
+				} else {
+					cell.style["backgroundColor"] = "rgb(240, 255, 240)";
+				}
+			});
+		});
+	}
+
+	document.addEventListener("DOMContentLoaded", contentLoaded);
+}());
+</script>

@@ -1,0 +1,123 @@
+<script type="text/javascript" src="https://server/subsite/SiteAssets/jquery-1.9.1.js"></script>
+ 
+<script type="text/javascript" defer>
+/*
+SharePoint Kalender farblich hervorheben (Überlagerungen sind ja begrenzt)
+*/
+	var items = null;
+	var cache = {};
+
+    function ApplyColor() {
+		if (!items) {
+			// load list
+			$.ajax({
+				url: _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbytitle('Kalenderfarben')/items?$select=Title,Farbe",
+				type: "GET",
+				dataType: "json",
+				headers: {
+					Accept: "application/json;odata=nometadata"
+				}
+			}).done(function(data, textStatus, jqXHR) {
+				// Unsere Farbliste, Namen in Grossbuchstaben
+				items = data.value.map(function(item) {
+					return { Name: item.Title.toUpperCase(), Farbe: item.Farbe };
+				});
+
+				var defaultItem = { Name: "DEFAULT", Farbe: "crimson" };
+				items.push(defaultItem);
+
+				_applyColors(items);
+			});
+		} else {
+			_applyColors(items);
+		}
+
+		function _applyColors(items) {
+
+			function getColorItemOrNull(name) {
+				var key = name.toUpperCase();
+				var item = cache[key];
+
+				if (!item) {
+					item = items.filter(function(item) {
+						return item.Name.indexOf(key) >= 0;
+					})[0];
+
+					if (item) {
+						cache[key] = item;
+					}
+				}
+
+				return item;
+			}
+
+			function getColorOrDefault(name) {
+				var key = name.toUpperCase();
+				var item = cache[key];
+
+				if (!item) {
+					item = getColorItemOrNull(key) || getColorItemOrNull("DEFAULT") || defaultItem;
+					cache[key] = item;
+				}
+
+				return item.Farbe;
+			}
+
+			$("div[webpartid] > .ms-acal-rootdiv a:not([data-completed=1])").each(function(index, node) {
+				var nodeText = $(node).text();
+				var userinfo = (nodeText.match(/ \([^\\)]+\) /) || [""])[0];
+
+				var container = $(node).parents(".ms-acal-item").first();
+				var containerTitle = container.prop("title") || "";
+
+				if (userinfo.length >= 2) {
+					// user info correction
+					nodeText = nodeText.replace(userinfo, " ");
+					nodeText = nodeText.replace(/[\(\)]/g, " ");
+					nodeText = nodeText + userinfo;
+					nodeText = nodeText.replace(/[ ]+/g, " ");
+					$(node).text(nodeText);
+
+					var username = userinfo.toLowerCase().replace(/[\(\) ]/g, "");
+					var lastname = username.split(',')[0];
+					var color;
+
+					if (containerTitle.indexOf("(Ausstehend)") >= 0) {
+						color = getColorOrDefault("(Ausstehend)");
+					} else {
+						color = getColorOrDefault(lastname);
+					}
+
+					container.css("background-color", color);
+				} else if (nodeText.length > 0) {
+					var colorItem = getColorItemOrNull(nodeText);
+
+					if (colorItem) {
+						console.log("found");
+						container.css("background-color", colorItem.Farbe);
+					}
+				}
+
+				$(node).attr("data-completed", "1");
+			});
+		}
+    }
+
+	// https://www.codeproject.com/Tips/759006/Enhancing-SharePoint-Calendar-sp-ui-applicationpag
+	SP.SOD.executeOrDelayUntilScriptLoaded(function() {
+		// Week or Day Calendar View
+		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids_Old = SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids;
+		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids = function renderGrids(param) {
+			this.renderGrids_Old(param);
+			ApplyColor();
+		};
+
+		//Month Calendar View
+		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids_Old = SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids;
+		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids = function renderGrids(param) {
+			this.renderGrids_Old(param);
+			ApplyColor();
+		};
+
+	}, "SP.UI.ApplicationPages.Calendar.js");
+</script>

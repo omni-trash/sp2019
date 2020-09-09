@@ -1,0 +1,18 @@
+<script type="text/javascript" defer>
+/*
+Das Skript setzt voraus, dass eine Liste angelegt wurde, und dass es dort eine berechnete Spalte gibt, wo dann "<div class='color-preview'>=[Farbcode]</div>" drinsteht.
+*/
+function colorpreview() {
+	var cells = Array.prototype.slice.call(document.getElementsByTagName("td"));
+
+	var items = cells.filter(function (item) {
+		return (item.innerText || item.textContent).indexOf("<div class='color-preview'") == 0;
+	});
+
+	items.forEach(function (item) {
+		item.innerHTML = item.innerText;
+	});
+}
+
+document.addEventListener("DOMContentLoaded", colorpreview);
+</script>
