@@ -1,4 +1,5 @@
 <script>
+/* Some helpful utilities */
 var utils = (function() {
 	function  string_ensure(value) {
 		return (value || "").toString();
@@ -238,7 +239,7 @@ var utils = (function() {
 		var bag = {};
 
 		format = escape(format, bag);
-		format = format.replace(/[a-z]+/gi, function(m) {
+		format = format.replace(/([a-zA-Z])\1*/g, function(m) {
 			switch (m) {
 				// years
 				case "yyyy": return ("0000" + date.getFullYear()).slice(-4);
