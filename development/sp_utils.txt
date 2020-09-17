@@ -460,7 +460,7 @@ var utils = (function() {
 		};
 
 		return p;
-	}
+
 
 	promise.resolve = function(value) {
 		return promise(function(resolve, reject) {
@@ -541,10 +541,16 @@ var utils = (function() {
 		ajax[verb.toLowerCase()] = function(url, options) { return ajax({ verb: verb, url: url, options: options }); };
 	});
 
+	// see ID.js, unique enough in most cases
+	function make_id() { 
+		return "_" + Math.random().toString(36).substr(2, 9);
+	};
+
 	var api = {
 		_async: _async,
 		promise: promise,
 		ajax: ajax,
+		id: make_id,
 		string: {
 			ensure: string_ensure,
 			trim: string_trim,
