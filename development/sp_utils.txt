@@ -77,8 +77,18 @@ var utils = (function() {
 
 		return (string_timehash(value, timestamp) == timehash);
 	}
+	
+	function string_encodeHtml(value) {
+		array_each(string_encodeHtml.map, function(enc) {
+			value = string_replace(value, enc[0], enc[1]);
+		});
 
-	function string_interpolate(format, params) {
+		return value;
+	}
+
+	string_encodeHtml.map = [["&", "&amp;"], ["<", "&lt;"], [">", "&gt;"], ["'", "&apos;"], ['"', "&quot;"]];
+
+	function string_interpolate(format, params, encode) {
 		function getfield(p, v) {
 			// indexer [idx]
 			p = p.replace(/\[(\d+)\]/g, function(m, n) { return "." + n; });
@@ -132,8 +142,13 @@ var utils = (function() {
 			var tokens = string_split(v, ":", 2);
 			var result = getfield(tokens[0], params);
 			var fmtdsc = tokens[1];
+			var result = formatting(fmtdsc, result);
 			
-			return formatting(fmtdsc, result);
+			if (encode) {
+				result = encode(result);
+			}
+
+			return result;
 		});
 	}
 
@@ -194,6 +209,8 @@ var utils = (function() {
 		};
 	});
 
+	// some common date formats
+	// https://docs.microsoft.com/de-de/dotnet/standard/base-types/custom-date-and-time-format-strings
 	string_interpolate.formatters["date"] = function (format, date) {
 		if (!format || !date) {
 			return date;
@@ -354,7 +371,7 @@ var utils = (function() {
 	}
 
 	function dom_getText(node) {
-		return (node.innerText || node.textContent);
+		return (node.textContent || node.innerText);
 	}
 
 	function dom_setHtml(node, html) {
@@ -396,6 +413,7 @@ var utils = (function() {
 	}
 
 	// note: no states
+	// https://cdn.jsdelivr.net/npm/es6-promise/dist/es6-promise.js
 	function promise(executor) {
 		var queue = [];
 
@@ -460,7 +478,7 @@ var utils = (function() {
 		};
 
 		return p;
-
+	}
 
 	promise.resolve = function(value) {
 		return promise(function(resolve, reject) {
@@ -558,7 +576,8 @@ var utils = (function() {
 			split: string_split,
 			timehash: string_timehash,
 			format: string_format,
-			empty: string_empty
+			empty: string_empty,
+			encodeHtml: string_encodeHtml
 		},
 		array: {
 			ensure: array_ensure,
