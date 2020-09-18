@@ -1,7 +1,7 @@
 <script>
 /* Some helpful utilities */
 var utils = (function() {
-	function  string_ensure(value) {
+	function string_ensure(value) {
 		return (value || "").toString();
 	}
 	
