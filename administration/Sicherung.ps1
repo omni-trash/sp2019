@@ -35,10 +35,10 @@ if (!(Test-Path "$backupList")) { mkdir "$backupList" }
     $webUrl  = $_.url
     $webName = $_.name
 
-    # for each list
+    # for each list, "<web>#<list>"
     (Get-SPWeb -Identity "$webUrl").Lists | % { 
-        Write-Host "Backup List ""$url/$($_.title)"" to ""$backupList\$($webName)_$($_.title)"""
-        Export-SPWeb -Identity "$webUrl/" -ItemUrl "$($_.parentWebURL)/$($_.RootFolder)" -Path "$backupList\$($webName)_$($_.title)"
+        Write-Host "Backup List ""$url/$($_.title)"" to ""$backupList\$($webName)#$($_.title)"""
+        Export-SPWeb -Identity "$webUrl/" -ItemUrl "$($_.parentWebURL)/$($_.RootFolder)" -Path "$backupList\$($webName)#$($_.title)"
     }
 }
 
