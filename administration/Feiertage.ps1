@@ -38,18 +38,37 @@ function feiertageBeweglich {
         $jahr
     )
 
+    # Festlegungen: 
+    # - Allgemein geht es um den 1. Sonntag nach 1. Vollmond nach Frühlingsanfang
+    # - Frühlingsanfang ist 21. März
+    # - Ostern ist spätestens am 25. April
+
+    $M = 24
+    $N = 5
+
     $a = $jahr % 19;
     $b = $jahr % 4;
     $c = $jahr % 7;
-    $d = ($a * 19 + 24) % 30;
-    $e = (($b * 2) + ($c * 4) + ($d * 6) + 5) % 7;
+    $d = ($a * 19 + $M) % 30;
+    $e = (($b * 2) + ($c * 4) + ($d * 6) + $N) % 7;
     $offset = $d + $e + 22
+    $error1 = ((11 * $M + 11) % 30 -lt 19)
 
     # offset gleich Tage ab März (kann auch bis in den April gehen!)
     # wir brauchen quasi 1. März minus 1 (Schaltjahr wird automatisch berechnet)
     # und dann den offset oben drauf, dann haben wir Ostersonntag.
     # Hinweis: nehmen hier UTC für den SP Kalender, weil dann keine Timezone drin ist
     $ostern = (New-Object DateTime $jahr, 3, 1, 0, 0, 0, ([DateTimeKind]::Utc)).Date.AddDays(-1).AddDays($offset)
+
+    # > 25. April Regel
+    while ($ostern.Month -ge 4 -and $ostern.Day -gt 25) {
+        $ostern = $ostern.AddDays(-7)
+    }
+
+    # = 25. April Korrektur
+    if ($error1 -eq $true -and $ostern.Month -eq 4 -and $ostern.Day -eq 25 -and $d -eq 28 -and $e -eq 6) {
+        $ostern = $ostern.AddDays(-7)
+    }
 
     # Array mit Hashtable (nicht [PSCustomObject])
     return @(
