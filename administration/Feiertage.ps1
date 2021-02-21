@@ -60,8 +60,11 @@ function feiertageBeweglich {
     # Hinweis: nehmen hier UTC für den SP Kalender, weil dann keine Timezone drin ist
     $ostern = (New-Object DateTime $jahr, 3, 1, 0, 0, 0, ([DateTimeKind]::Utc)).Date.AddDays(-1).AddDays($offset)
 
+    # nicht nach 25. April (wurde mal so festgelegt)
+    $osternMax = (New-Object DateTime $jahr, 4, 26, 0, 0, 0, ([DateTimeKind]::Utc))
+
     # > 25. April Regel
-    while ($ostern.Month -ge 4 -and $ostern.Day -gt 25) {
+    while ($ostern.Month -ge $osternMax) {
         $ostern = $ostern.AddDays(-7)
     }
 
