@@ -1,4 +1,4 @@
-﻿<# 
+<# 
     Legt Kalendereinträge für folgende Tage an:
 
     Arbeitsfreie Tage
@@ -39,11 +39,11 @@ function feiertageBeweglich {
     )
 
     $a = $jahr % 19;
-	$b = $jahr % 4;
-	$c = $jahr % 7;
-	$d = ($a * 19 + 24) % 30;
-	$e = (($b * 2) + ($c * 4) + ($d * 6) + 5) % 7;
-	$offset = $d + $e + 22
+    $b = $jahr % 4;
+    $c = $jahr % 7;
+    $d = ($a * 19 + 24) % 30;
+    $e = (($b * 2) + ($c * 4) + ($d * 6) + 5) % 7;
+    $offset = $d + $e + 22
 
     # offset gleich Tage ab März (kann auch bis in den April gehen!)
     # wir brauchen quasi 1. März minus 1 (Schaltjahr wird automatisch berechnet)
@@ -54,20 +54,20 @@ function feiertageBeweglich {
     # Array mit Hashtable (nicht [PSCustomObject])
     return @(
         @{
-			Titel = "Karfreitag";
-			Datum = $ostern.AddDays(-2)
-		},
-		@{
-			Titel = "Ostermontag";
-			Datum = $ostern.AddDays(1)
-		},
-		@{
-			Titel = "Himmelfahrt";
-			Datum = $ostern.AddDays(39)
-		},
-		@{
-			Titel = "Pfingstmontag";
-			Datum = $ostern.AddDays(50)
+            Titel = "Karfreitag";
+            Datum = $ostern.AddDays(-2)
+        },
+        @{
+            Titel = "Ostermontag";
+            Datum = $ostern.AddDays(1)
+        },
+        @{
+            Titel = "Himmelfahrt";
+            Datum = $ostern.AddDays(39)
+        },
+        @{
+            Titel = "Pfingstmontag";
+            Datum = $ostern.AddDays(50)
         }
     );
 }
@@ -79,36 +79,36 @@ function feiertageFest {
         $jahr
     )
 
-	return @(
-		@{
-			Titel = "Neujahr";
-			Datum = (New-Object DateTime $jahr, 1, 1, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "Heilige Drei Könige";
-			Datum = (New-Object DateTime $jahr, 1, 6, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "Tag der Arbeit";
-			Datum = (New-Object DateTime $jahr, 5, 1, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "Tag der Deutschen Einheit";
-			Datum = (New-Object DateTime $jahr, 10, 3, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "Reformationstag";
-			Datum = (New-Object DateTime $jahr, 10, 31, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "1. Weihnachtstag";
-			Datum = (New-Object DateTime $jahr, 12, 25, 0, 0, 0, ([DateTimeKind]::Utc))
-		},
-		@{
-			Titel = "2. Weihnachtstag";
-			Datum = (New-Object DateTime $jahr, 12, 26, 0, 0, 0, ([DateTimeKind]::Utc));
-		}
-	);
+    return @(
+        @{
+            Titel = "Neujahr";
+            Datum = (New-Object DateTime $jahr, 1, 1, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "Heilige Drei Könige";
+            Datum = (New-Object DateTime $jahr, 1, 6, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "Tag der Arbeit";
+            Datum = (New-Object DateTime $jahr, 5, 1, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "Tag der Deutschen Einheit";
+            Datum = (New-Object DateTime $jahr, 10, 3, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "Reformationstag";
+            Datum = (New-Object DateTime $jahr, 10, 31, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "1. Weihnachtstag";
+            Datum = (New-Object DateTime $jahr, 12, 25, 0, 0, 0, ([DateTimeKind]::Utc))
+        },
+        @{
+            Titel = "2. Weihnachtstag";
+            Datum = (New-Object DateTime $jahr, 12, 26, 0, 0, 0, ([DateTimeKind]::Utc));
+        }
+    );
 }
 
 # Samstag/Sonntag (alle Tage für das Jahr)
@@ -118,7 +118,7 @@ function wochenende {
         $jahr
     )
 
-	$day  = [DateTime](New-Object DateTime $jahr, 1, 1, 0, 0, 0, ([DateTimeKind]::Utc));
+    $day  = [DateTime](New-Object DateTime $jahr, 1, 1, 0, 0, 0, ([DateTimeKind]::Utc));
     $days = @()
 
     while ($day.Year -eq $jahr) {
@@ -126,15 +126,15 @@ function wochenende {
         switch ($day.DayOfWeek.value__) {
             0 { 
                 $days = $days + @{
-			        Titel = "Sonntag";
-			        Datum = $day;
-		        }
+                    Titel = "Sonntag";
+                    Datum = $day;
+                }
             }
             6 { 
                 $days = $days + @{
-			        Titel = "Samstag";
-			        Datum = $day;
-		        }
+                    Titel = "Samstag";
+                    Datum = $day;
+                }
             }
         }
 
@@ -178,7 +178,7 @@ for ($jahr = $yearFirst; $jahr -le $yearLast; $jahr++) {
 }
 
 
-###############################################################################################	
+###############################################################################################    
 # soweit so gut, jetzt den Kalender mit den Events befüllen
 # TODO: neuen Kalender auf SP erstellen!
 
