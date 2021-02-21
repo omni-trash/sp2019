@@ -64,7 +64,7 @@ function feiertageBeweglich {
     $osternMax = (New-Object DateTime $jahr, 4, 26, 0, 0, 0, ([DateTimeKind]::Utc))
 
     # > 25. April Regel
-    while ($ostern.Month -ge $osternMax) {
+    while ($ostern -ge $osternMax) {
         $ostern = $ostern.AddDays(-7)
     }
 
