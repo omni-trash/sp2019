@@ -3,11 +3,21 @@ SharePoint 2019 Management Shell als Administrator:
 stsadm.exe -o localupgradestatus
 psconfig -cmd upgrade -inplace b2b -wait
 
+
 = PnPOnline (Powershell) =
+# installierte Module
+Get-InstalledModule Sharepoint*
+
+# verfügbare Module abrufen
 Find-Module Sharepoint* | sort -Property Name
+
+# installieren
 Install-Module SharePointPnPPowerShell2019
 #Install-Module SharePointPnPPowerShellOnline
+
+# aktualisieren
 Update Module Sharepoint*
+
 
 = custom tiles =
 SharePoint 2019 Management Shell als Administrator:
@@ -16,9 +26,11 @@ Enable-SPFeature -Identity CustomTiles -Url "http://SP2019:8033"
 
 App-Launcher konfigurieren: "http://SP2019/lists/custom tiles/"
 
+
 = Proxy setzen =
 npm config set proxy http://192.168.240.70:3128
 npm config set https-proxy http://192.168.240.70:3128
+
 
 = Entwicklungsumgebung einrichten =
 https://docs.microsoft.com/de-de/sharepoint/dev/spfx/set-up-your-development-environment
@@ -27,6 +39,7 @@ https://github.com/StfBauer/sp-dev-docs/blob/patch-6/docs/spfx/set-up-your-devel
 - node.js installieren (LTS version 8!)
 - npm install -g yo gulp
 - npm install -g @microsoft/generator-sharepoint
+
 
 = Projekt anlegen =
 https://docs.microsoft.com/de-DE/sharepoint/dev/spfx/web-parts/get-started/build-a-hello-world-web-part
@@ -58,6 +71,7 @@ Version in package.json und package-solution anpassen.
 - gulp package-solution --ship (creates the sppkg in "sharepoint\solution")
 - goto site's app catalog and upload the "helloworld-webpart\sharepoint\solution\helloword-webpart.sppkg"
 
+
 = Nennenswertes =
 - Die Option --ship bedeutet, dass ein Build for Distribution (Release) erstellt wird, Build Target is SHIP.
 - npm version [major|minor|patch] zum Erhöhen der Version in package.json (NodeJS Projekt Version, 3stellig, Major.Minor.Patch)
@@ -67,6 +81,7 @@ Version in package.json und package-solution anpassen.
 - npm install jquery (JavaScript Lib)
 - npm install @types/jquery --save (TypeScript)
 - npm install @types/jquery.datatables --save (TypeScript)
+
 
 = Update to SPFx 1.4.1 (SP19, latest supported version)
 npm outdated
