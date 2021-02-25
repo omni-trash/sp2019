@@ -3,6 +3,12 @@ SharePoint 2019 Management Shell als Administrator:
 stsadm.exe -o localupgradestatus
 psconfig -cmd upgrade -inplace b2b -wait
 
+= PnPOnline (Powershell) =
+Find-Module Sharepoint* | sort -Property Name
+Install-Module SharePointPnPPowerShell2019
+#Install-Module SharePointPnPPowerShellOnline
+Update Module Sharepoint*
+
 = custom tiles =
 SharePoint 2019 Management Shell als Administrator:
 Enable-SPFeature -Identity CustomTiles -Url "http://SP2019"
