@@ -13,7 +13,8 @@ Find-Module Sharepoint* | sort -Property Name
 
 # installieren
 Install-Module SharePointPnPPowerShell2019
-#Install-Module SharePointPnPPowerShellOnline
+#Install-Module SharePointPnPPowerShellOnline  # SharePoint On-Premises (2013, 2016 and 2019) and SharePoint Online
+#Install-Module PnP.PowerShell                 # SharePoint Online
 
 # aktualisieren
 Update Module Sharepoint*
