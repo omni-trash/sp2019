@@ -518,7 +518,7 @@ var utils = (function() {
 			xhr.open(settings.verb, url, true);
 			xhr.timeout = (options.timeout || 0);
 			xhr.withCredentials = (options.withCredentials === true);
-			xhr.responseType = options.responseType;
+			xhr.responseType = (options.responseType || xhr.responseType);
 
 			if (options.mimeType) {
 				// IE11+ (not IE10 document mode)
@@ -543,7 +543,7 @@ var utils = (function() {
 				xhr.onload = xhr.onerror = xhr.onabort = xhr.ontimeout = xhr.onprogress = null;
 
 				if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status < 300) {
-					resolve({ settings: settings, xhr: xhr });
+					resolve({ settings: settings, xhr: xhr, json: function () { return JSON.parse(xhr.responseText); } });
 				}
 				else {
 					reject({ settings: settings, xhr: xhr });
