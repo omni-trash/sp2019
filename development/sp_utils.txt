@@ -2,7 +2,8 @@
 /* Some helpful utilities */
 var utils = (function() {
 	function string_ensure(value) {
-		return (value || "").toString();
+		return (value == null ? "" : value).toString();
+		// return (value || "").toString();
 	}
 	
 	function string_trim(value) {
