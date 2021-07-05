@@ -10,8 +10,7 @@ Add-PSSnapin Microsoft.SharePoint.PowerShell
 
 # 14 days
 $backupSlot = ((Get-Date).DayOfYear % 14 + 1)
-#$backupRoot = "\\barodcbuel5\BUEL\EDV\Sharepoint\Backup\$backupSlot";
-$backupRoot = "\\barodcbuel5\BUEL\EDV\Sharepoint\Backup\test";
+$backupRoot = "\\barodcbuel5\BUEL\EDV\Sharepoint\Backup\$backupSlot";
 $backupFull = "$backupRoot\full"
 $backupList = "$backupRoot\list"
 
