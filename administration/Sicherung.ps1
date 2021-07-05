@@ -48,3 +48,6 @@ $webs | Select-Object -Property name, url | % {
         Export-SPWeb -Identity "$webUrl/" -ItemUrl "$($_.parentWebURL.TrimEnd("/"))/$($_.RootFolder)" -Path "$backupList\$($webName)#$($_.title)"
     }
 }
+
+# Liste/Web importieren
+# Import-SPWeb -Identity "https://server/<subweb>" -Path "<path to backup>\<your list>.cmp"
