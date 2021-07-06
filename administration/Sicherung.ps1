@@ -50,8 +50,9 @@ $webs | Select-Object -Property name, url | % {
 }
 
 # Liste/Web importieren
-# Import-SPWeb -Identity "https://server/<subweb>" -Path "<path to backup>\<your list>.cmp" -IncludeUserSecurity
-# Note: IncludeUserSecurity will restore the dates "created on" and "modified on", but not the author
+# Import-SPWeb -Identity "https://server/<website>" -Path "<path to backup>\<your list>.cmp" -IncludeUserSecurity
+# Note: IncludeUserSecurity will restore "Created" and "Modified" for each item
+# Node: IncludeUserSecurity will restore "Author" and "Editor" for each item only if you have system privileges (example sharepoint service account)
 #
 # sample export a list and import to another website
 # Export-SPWeb -Identity https://server/ -ItemUrl /Lists/Bestellungen -Path \\Backup\202010705\#Bestellungen
