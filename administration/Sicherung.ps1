@@ -53,6 +53,6 @@ $webs | Select-Object -Property name, url | % {
 # Import-SPWeb -Identity "https://server/<subweb>" -Path "<path to backup>\<your list>.cmp" -IncludeUserSecurity
 # Note: IncludeUserSecurity will restore the dates "created on" and "modified on", but not the author
 #
-# sample export a list and import to another subweb
+# sample export a list and import to another website
 # Export-SPWeb -Identity https://server/ -ItemUrl /Lists/Bestellungen -Path \\Backup\202010705\#Bestellungen
-# Import-SPWeb -Identity "https://server/subweb" -Path "\\Backup\202010705\#Bestellungen.cmp" -IncludeUserSecurity
+# Import-SPWeb -Identity "https://server/website" -Path "\\Backup\202010705\#Bestellungen.cmp" -IncludeUserSecurity
