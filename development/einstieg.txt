@@ -17,7 +17,7 @@ Install-Module SharePointPnPPowerShell2019
 #Install-Module PnP.PowerShell                 # SharePoint Online
 
 # aktualisieren
-Update Module Sharepoint*
+Update-Module Sharepoint*
 
 
 = custom tiles =
