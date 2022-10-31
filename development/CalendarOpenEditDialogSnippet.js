@@ -2,8 +2,8 @@
 <script type="text/javascript" defer>
 // IIFE
 (function() {
-	// refresh page when dialog result is SP.UI.DialogResult.OK
-	function refreshPage(dialogResult) {
+	// Helper, refresh page when dialog result is SP.UI.DialogResult.OK
+	function refreshPageAsync(dialogResult) {
 		// we need a delay for our workflow to run
 		// the workflow updates the title field
 		//
@@ -13,10 +13,19 @@
 		}, 500);
 	}
 
-	function calendarLoaded(calendar) {
+	// Helper, combines two function calls
+	function combineNoResult(f1, f2) {
+		return function() {
+			f1.apply(this, arguments);
+			f2.apply(this, arguments);
+		}
+	}
+
+	// this is CalendarView
+	function calendarLoaded() {
 		// lag of information, docs are useless
 		// div.ms-acal-rootdiv
-		var root = $(calendar["$1z_1"]);
+		var root = $(this["$1z_1"]);
 
 		$("a[href*='DispForm.aspx']", root).each(function () {
 			var $me = $(this);
@@ -40,7 +49,7 @@
 					title: "Kalender - " + title,
 					autoSize:true,        
 					url: url,
-					dialogReturnValueCallback: refreshPage
+					dialogReturnValueCallback: refreshPageAsync
 				};
 
 				SP.UI.ModalDialog.showModalDialog(options);
@@ -51,18 +60,9 @@
 	// https://www.codeproject.com/Tips/759006/Enhancing-SharePoint-Calendar-sp-ui-applicationpag
 	SP.SOD.executeOrDelayUntilScriptLoaded(function() {
 		// Week or Day Calendar View
-		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids_Old = SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids;
-		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids = function renderGrids(param) {
-			this.renderGrids_Old(param);
-			calendarLoaded(this);
-		};
-
+		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids  = combineNoResult(SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids,  calendarLoaded);
 		//Month Calendar View
-		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids_Old = SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids;
-		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids = function renderGrids(param) {
-			this.renderGrids_Old(param);
-			calendarLoaded(this);
-		};
+		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids = combineNoResult(SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids, calendarLoaded);
 
 	}, "SP.UI.ApplicationPages.Calendar.js");
 })();
