@@ -61,7 +61,7 @@
 	SP.SOD.executeOrDelayUntilScriptLoaded(function() {
 		// Week or Day Calendar View
 		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids  = combineNoResult(SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids,  calendarLoaded);
-		//Month Calendar View
+		// Month Calendar View
 		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids = combineNoResult(SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids, calendarLoaded);
 
 	}, "SP.UI.ApplicationPages.Calendar.js");
