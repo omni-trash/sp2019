@@ -3,6 +3,3 @@
 
 # CalendarOpenEditDialogSnippet
 ...
-
-# JSLink_FieldValuesFromUrl
-...
