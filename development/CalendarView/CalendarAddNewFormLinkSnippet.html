@@ -1,0 +1,278 @@
+<script type="text/javascript" src="http://code.jquery.com/jquery-3.5.0.min.js"></script>
+
+<template data-name="calender-custom-menu">
+	<div class="calendar-custom-hover-menu-container">
+		<a class="menuitem newitemlink">Neuer Eintrag</a>
+	</div>
+</template>
+
+<style>
+.calendar-custom-hover-menu-container {
+	position: absolute;
+	right: 0; 
+	bottom: 0; 
+	color: green; 
+	z-index: 999; 
+	height: auto !important;
+}
+
+.calendar-custom-hover-menu-container .menuitem {
+	height: auto !important;
+	cursor: pointer;
+	padding: 2px;
+	display: block;
+}
+</style>
+
+<script type="text/javascript" defer>
+/*
+This Snippet is for Calendar View of a List
+06.11.20212
+
+Adds a New Item Link on the Calendar Cell when Mouse hover.
+Will open the New Form Dialog with the Start Time set to the Cell Date.
+*/
+
+// IIFE
+(function() {
+	// Helper, refresh calender or page when dialog result is SP.UI.DialogResult.OK
+	function refreshCalendarAsync(container, dialogResult) {
+		// we need a delay for our workflow to run
+		// the workflow updates the title field
+		//
+		// if u dont have any workflows to run u can remove the timeout value
+		setTimeout(function() {
+			if (dialogResult != SP.UI.DialogResult.OK){
+				return;
+			}
+
+			if (typeof container == "object" && "refreshItems" in container) {
+				// preserves the current view
+				container.refreshItems();
+			} else {
+				// fallback, but loads the whole page and default view
+				SP.UI.ModalDialog.RefreshPage(dialogResult);
+			}
+		}, 500);
+	}
+
+	// Helper, combines two function calls
+	function combineNoResult(f1, f2) {
+		return function() {
+			f1.apply(this, arguments);
+			f2.apply(this, arguments);
+		}
+	}
+
+	// Helper, take context from global context dictionary
+	function getContext(ctxId) {
+		for (let ctx of Object.values(g_ctxDict)) {
+			if (ctx.ctxId == ctxId) {
+				return ctx;
+			}
+		}
+	}
+
+	// Helper, wrap up and flatten calendar to simplify this code
+	function getCalendarInfo(calendar) {
+		// List_ContextInfo
+		var table     = calendar.$0_1;
+		var ctxid     = $(table.get_element()).attr("ctxid");
+		var ctx       = getContext(ctxid);
+
+		// SP.UI.ApplicationPages.CalendarContainer
+		var container = SP.UI.ApplicationPages.CalendarInstanceRepository.lookupInstance(ctxid);
+
+		return {
+			// Calendar
+			// MonthlyView | DetailCalendarView
+			CalendarView:           calendar,
+			// MonthlyCalendarTable | WeeklyCalendarTable | DailyCalendarTable
+			CalendarTable:          calendar.$0_1,
+			// The Div with the Calendar
+			RootDivCalendar:        calendar.$0_1.get_element(),
+			// The Div with the Events (they are positioned absolute over the Grid)
+			RootDivEvents:          calendar.$1z_1,
+			ItemDragHandler:        calendar.$4W_1,
+			DatePartitionSorter:    calendar.$4n_1,
+			DivInfoRepository:      calendar.$22_1,
+			// SummaryItemRenderer | DetailItemRenderer
+			ItemRenderer:           calendar.$G_1,
+			// MonthVirutalItem | DetailVirtualItem
+			VirutalItem:            calendar.$M_1,
+
+			// Container
+			CalendarContainer:      container,
+			CalendarService:        container.$6_1,
+			CalendarNewFormDialog:  container.$9_1,
+			CalendarMouseHandler:   container.$16_1,
+			RibbonConnector:        container.$17_1,
+			CalendarStateHandler:   container.$S_1,
+			EntityPaginator:        container.$Z_1,
+			ItemUpdater:            container.$c_1,
+			CalendarHeaderControls: container.$r_1,
+
+			// Context
+			ListContextInfo:        ctx,
+			PageContextInfo:        _spPageContextInfo
+		};
+	}
+
+	// Note: can be called multiple times if u have Calendars Overlay
+	function calendarLoaded() {
+		// wrap up and flatten
+		var calendar = getCalendarInfo(this);
+
+		// track
+		calendar.RootDivEvents[snippetId] = (calendar.RootDivEvents[snippetId] || 0) + 1;
+
+		if (calendar.RootDivEvents[snippetId] > 1) {
+			// prevent on Calendars Overlay, we need to call this Snippet only once
+			return;
+		}
+
+		setTimeout(() => calendarSetup(calendar));
+    };
+
+	// - find the calendar cells to use
+	// - take the date values
+	// - calculate the time values
+	// - attach to cell mouse hover event
+	// - render a "New Item" Link and open the NewForm.aspx Dialog when clicked
+	function calendarSetup(calendar) {
+		// Dont know how to use the virtual item stuff, but if we have a Calender (not a Calendar View of a List)
+		// then there is an new_item handler for the "Add" Hyperlink.
+		// In that case we dont need to add our custom "New Item" Hyperlink.
+		if (calendar.CalendarMouseHandler.$4M_1.new_item) {
+			return;
+		}
+
+		// take the table cells to use
+		var dateValues = calendar.CalendarTable.$5d_2;
+		var $rowsToUse = $(".ms-acal-summary-itemrow, [class^='ms-acal-hour']", calendar.RootDivCalendar).filter(":visible");
+		var $cells     = $("td", $rowsToUse);
+		var template   = document.querySelector("template[data-name='calender-custom-menu']");
+
+		// number of days shown (there is an additional date at the end we dont use)
+		var numDays    = dateValues.length - 1;
+
+		// grap start time from first time link (or undefined in Month View, notice that 2 * undefined is NaN)
+		var hourOffset = (2 * ($(".ms-acal-detailtime a[time]", $rowsToUse[0]).attr("time")));
+		var hourDefVal = "08:00";
+
+		// build hour values "00:00" .. "23:30"
+		var hourValues = [];
+
+		for (let i = 0; i < 24; ++i) {
+			const h = ("00" + i).slice(-2);
+
+			hourValues.push(h + ":00");
+			hourValues.push(h + ":30");
+		}
+
+		$cells.toArray().forEach((cell, index) => {
+			var $cell = $(cell);
+			var show  = false;
+
+			// calc datetime for that cell and remember
+			var day  = dateValues[index % numDays];
+			var hour = hourValues[parseInt(index / numDays) + hourOffset] || hourDefVal;
+
+			$cell.data("datetime", day + " " + hour);
+
+			// well pretty ugly but ok for now			
+			function mouseEnter() {
+				show = true;
+
+				// async
+				setTimeout(() => {
+					if (!show) {
+						return;
+					}
+
+					// set cell positioning to relative, so we can use absolute positon inside
+					$cell.css({ position: "relative"});
+
+					if ($cell.$hoverMenuContainer) {
+						$cell.$hoverMenuContainer.show();
+					}
+					else {
+						var $node = $(template.innerHTML);
+						var $link = $(".newitemlink", $node);
+
+						// Ok that's not the best but ok or now
+						// Note: u need a JSLink Script in the NewForm WebPart to take the URL Parameter and Render the Input Form for that Field
+						// Note: "Von" is the start time field i've created in my list, u have to change it to the field in your list
+						function openDialogAction(e) {
+							e.preventDefault();
+
+							var options = {
+								url: calendar.ListContextInfo.newFormUrl + '&Von=' + $cell.data("datetime"),
+								dialogReturnValueCallback: (result) => refreshCalendarAsync(calendar.CalendarContainer, result)
+							};
+
+							// async
+							setTimeout(() => SP.UI.ModalDialog.showModalDialog(options));
+						}
+
+						$link.on("click", openDialogAction);
+
+						$cell.append($node);
+						$cell.$hoverMenuContainer = $node;
+					}
+				}, 600);
+			}
+
+			// well pretty ugly but ok for now
+			function mouseLeave() {
+				show = false;
+
+				// async
+				setTimeout(() => {
+					if (show) {
+						return;
+					}
+
+					if ($cell.$hoverMenuContainer) {
+						$cell.$hoverMenuContainer.hide();
+					}
+
+					// restore cell positioning
+					$cell.css({ position: "unset"});
+				}, 200);
+			}
+
+			// remove handler
+			$cell.off("mouseenter");
+			$cell.off("mouseleave");
+
+			// add handler
+			$cell.on("mouseenter", mouseEnter);
+			$cell.on("mouseleave", mouseLeave);
+		});
+	}
+
+	// unique id of that snippet at runtime
+	var snippetId = null;
+
+	function load() {
+		// track snippet state
+		snippetId = snippetId || ("CalendarSnippet_" + SP.Guid.newGuid().toString());
+
+		// Attach to Week or Day Calendar View
+		SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids  = combineNoResult(
+			SP.UI.ApplicationPages.DetailCalendarView.prototype.renderGrids,  
+			calendarLoaded
+		);
+
+		// Attach to Month Calendar View
+		SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids = combineNoResult(
+			SP.UI.ApplicationPages.SummaryCalendarView.prototype.renderGrids, 
+			calendarLoaded
+		);
+	}
+
+	// https://www.codeproject.com/Tips/759006/Enhancing-SharePoint-Calendar-sp-ui-applicationpag
+	SP.SOD.executeOrDelayUntilScriptLoaded(load, "SP.UI.ApplicationPages.Calendar.js");
+})();
+</script>
