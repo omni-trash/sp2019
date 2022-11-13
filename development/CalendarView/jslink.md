@@ -20,14 +20,11 @@ or to display an list item by
 
 Ok great, but u cannot set the values in the form by passing they with the URL query string.
 
-So the follow URL will not set the field ``MyDate`` to the value, when the Dialog opens.
+So the follow URL will not set the field ``MyDate`` to the value `20.11.20222`, when the Dialog opens
+
 ``http://sp2019/Lists/<YourList>/NewForm.aspx?MyDate=20.11.20222``
 
-You can add a script to the Form Web Part, which set the value, ok will works.
-
-You can also use JSLink, the Microsoft Sharepoint Stuff.
-
-We use the ``TemplateManager`` in the JSLink Script, to override some Fields in the NewForm for example.
+We will use the ``TemplateManager`` in the JSLink Script (CSR), to override some Fields in the NewForm for example.
 
 See ``JSLink_FieldValuesFromUrl.js``
 
@@ -54,7 +51,14 @@ var overrides = {
 
 Ok so far, `GetUrlKeyValue` is also a build in function of the Sharepoint Client Script Library.
 
-Now we have to modify the New Form Web Part.
+Now we have to modify the New Form Web Part Page.
+
+There are two ways to embed the script in the Web Part Page.
+
+We can upload the Script to Site Assests and include the Link in the JSLink property of the Web Part (described here in detail with pictures).
+
+We can also add a Script Editor Web Part to the New Form Web Part Page with the content of the script. Then the script cannot be shared and works only for the Web Part Page with the Script Editor for the given list.
+
 
 ## Upload JSLink Script to Site Assets and Copy the Link
 ![](Images/jslink_upload.jpg)
