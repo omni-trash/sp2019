@@ -49,7 +49,7 @@ var overrides = {
 
 > Notice that we have to render a date and time input field by ``SPFieldDateTime_Edit``. There are several different render functions for different field types.
 
-Ok so far, `GetUrlKeyValue` is also a build in function of the Sharepoint Client Script Library.
+Ok so far, `GetUrlKeyValue` is also a build in function of the Sharepoint JavaScript Library (JSOM).
 
 Now we have to modify the New Form Web Part Page.
 
