@@ -1,10 +1,14 @@
 <script type="text/javascript" src="//code.jquery.com/jquery-3.5.0.min.js"></script>
 
-<template data-name="calender-custom-menu">
+<!--
+	Content Editor Web Part eats the template tag when use as inline code,
+	so we use div tag instead.
+-->
+<div style="display: none" data-name="calender-custom-menu">
 	<div class="calendar-custom-hover-menu-container">
 		<a class="menuitem newitemlink">Neuer Eintrag</a>
 	</div>
-</template>
+</div>
 
 <style>
 .calendar-custom-hover-menu-container {
@@ -151,7 +155,7 @@ Will open the New Form Dialog with the Start Time set to the Cell Date.
 		var dateValues = calendar.CalendarTable.$5d_2;
 		var $rowsToUse = $(".ms-acal-summary-itemrow, [class^='ms-acal-hour']", calendar.RootDivCalendar).filter(":visible");
 		var $cells     = $("td", $rowsToUse);
-		var template   = document.querySelector("template[data-name='calender-custom-menu']");
+		var template   = document.querySelector("[data-name='calender-custom-menu']");
 
 		// number of days shown (there is an additional date at the end we dont use)
 		var numDays    = dateValues.length - 1;
